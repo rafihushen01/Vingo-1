@@ -1,0 +1,84 @@
+import React from 'react'
+import { Navigate, Route, Routes } from 'react-router-dom'
+import Signup from './pages/Signup'
+import Signin from './pages/Signin'
+import ForgetPassword from './pages/ForgetPassword'
+import UseGetCurrentUser from './Hooks/UseGetCurrentUser.jsx'
+import { useDispatch, useSelector } from 'react-redux'
+import Home from './pages/Home.jsx'
+import UseGetCurrentCity from './Hooks/UseGetMyCity.jsx'
+import UseGetCurrentShop from './Hooks/Usegetmyshop.jsx'
+import Createeditshop from './pages/Createeditshop.jsx'
+import AddItems from './pages/AddItems.jsx'
+import EditItems from './pages/EditItems.jsx'
+import Usegetshopbycity from './Hooks/UseGetShopByCity.jsx'
+import Usegetitembycity from './Hooks/UseGetItemBycity.jsx'
+import CartItem from './pages/CartItem.jsx'
+import Checkout from './components/Checkout.jsx'
+import PlaceOrder from './components/PlaceOrder.jsx'
+import OwnerOrders from './components/OwnerOrders.jsx'
+import UseGetOrders from './Hooks/Usegetmyorders.jsx'
+import UseGetownerOrders from './Hooks/UsegetMyOwnerOrders.jsx'
+import UserMyorders from './components/UserMyorders.jsx'
+import useupdatelocation from './Hooks/Useupdateuserlocation.jsx'
+import TrackorderPage from './components/TrackorderPage.jsx'
+import { useEffect } from 'react'
+import {io} from "socket.io-client"
+import { setsocket } from './pages/redux/UserSlice.js'
+import Shop from './components/Shop.jsx'
+
+export const serverurl="https://vingobackend-production.up.railway.app"
+const APP = () => {
+  // const dispatch=useDispatch()
+   const{userData}=useSelector(state=>state.user)
+  UseGetCurrentUser();
+  UseGetCurrentCity()
+  UseGetCurrentShop()
+  Usegetshopbycity()
+
+  Usegetitembycity()
+  UseGetOrders()
+  UseGetownerOrders()
+  useupdatelocation()
+//    useEffect(()=>{
+// const socketinstance= io(serverurl,{withCredentials:true})
+//     dispatch(setsocket(socketinstance))
+//    socketinstance.on("connect",()=>{
+//     if(userData){
+
+
+//      socketinstance.emit("identity",{userId:userData._id})
+//  }
+
+ 
+
+//    })
+
+//    },[])
+ 
+
+  return (
+    <div>
+      <Routes>
+          <Route path='/signup' element={!userData ?<Signup/> :<Navigate to={"/"}/>}/>
+      <Route path='/signin' element={!userData ?<Signin/>:<Navigate to={"/"}/>}/>
+        <Route path='/forgetpass' element={userData ?<ForgetPassword/> :<Navigate to={"/signup"}/>}/>
+             <Route path='/' element={userData ?<Home/>:<Navigate to={"/signup"}/>}/> 
+
+                             <Route path='/createeditshop' element={userData ?<Createeditshop/>:<Navigate to={"/signup"}/>}/> 
+                                            <Route path='/additems' element={userData ?<AddItems/>:<Navigate to={"/signup"}/>}/> 
+<Route path="/edititem/:itemId" element={userData ? <EditItems/> : <Navigate to={"/signup"}/>}/>
+  <Route path='/cartitem' element={userData ?<CartItem/>:<Navigate to={"/signup"}/>}/> 
+   <Route path='/checkout' element={userData ?<Checkout/>:<Navigate to={"/signup"}/>}/> 
+  <Route path='/placeorder' element={userData ?<PlaceOrder/>:<Navigate to={"/signup"}/>}/> 
+   <Route path='/ownerorders' element={userData ?<OwnerOrders/>:<Navigate to={"/signup"}/>}/>
+      <Route path='/userorders' element={userData ?<UserMyorders/>:<Navigate to={"/signup"}/>}/>
+     <Route path='/trackorder/:orderId' element={userData ?<TrackorderPage/>:<Navigate to={"/signup"}/>}/>
+        <Route path='/shop/:shopId' element={userData ?<Shop/>:<Navigate to={"/signup"}/>}/>
+
+      </Routes>
+    </div>
+  )
+}
+
+export default APP
