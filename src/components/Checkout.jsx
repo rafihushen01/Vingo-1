@@ -56,8 +56,7 @@ const Checkout = () => {
   const [addressinput, setaddressinput] = useState("");
   const [loading, setLoading] = useState(false);
   const [paymentmethod, setpaymentmethod] = useState("Cod");
-  const { currentcity, currentstate, currentaddress, totalamount } =
-    useSelector((state) => state.user);
+  const { totalamount } = useSelector((state) => state.user);
     const [delmobile,setdelmobile]=useState("")
   const deliveryfee = totalamount > 3000? 0 : 100;
   const totalamountwithdeliveryfee = totalamount + deliveryfee;

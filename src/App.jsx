@@ -4,7 +4,7 @@ import Signup from './pages/Signup'
 import Signin from './pages/Signin'
 import ForgetPassword from './pages/ForgetPassword'
 import UseGetCurrentUser from './Hooks/UseGetCurrentUser.jsx'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import Home from './pages/Home.jsx'
 import UseGetCurrentCity from './Hooks/UseGetMyCity.jsx'
 import UseGetCurrentShop from './Hooks/Usegetmyshop.jsx'
@@ -20,16 +20,12 @@ import OwnerOrders from './components/OwnerOrders.jsx'
 import UseGetOrders from './Hooks/Usegetmyorders.jsx'
 import UseGetownerOrders from './Hooks/UsegetMyOwnerOrders.jsx'
 import UserMyorders from './components/UserMyorders.jsx'
-import useupdatelocation from './Hooks/Useupdateuserlocation.jsx'
+import useUpdateLocation from './Hooks/Useupdateuserlocation.jsx'
 import TrackorderPage from './components/TrackorderPage.jsx'
-import { useEffect } from 'react'
-import {io} from "socket.io-client"
-import { setsocket } from './pages/redux/UserSlice.js'
 import Shop from './components/Shop.jsx'
 
 export const serverurl="https://vingobackend-production.up.railway.app"
 const APP = () => {
-  // const dispatch=useDispatch()
    const{userData}=useSelector(state=>state.user)
   UseGetCurrentUser();
   UseGetCurrentCity()
@@ -39,22 +35,7 @@ const APP = () => {
   Usegetitembycity()
   UseGetOrders()
   UseGetownerOrders()
-  useupdatelocation()
-//    useEffect(()=>{
-// const socketinstance= io(serverurl,{withCredentials:true})
-//     dispatch(setsocket(socketinstance))
-//    socketinstance.on("connect",()=>{
-//     if(userData){
-
-
-//      socketinstance.emit("identity",{userId:userData._id})
-//  }
-
- 
-
-//    })
-
-//    },[])
+  useUpdateLocation()
  
 
   return (

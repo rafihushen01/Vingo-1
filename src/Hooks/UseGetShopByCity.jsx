@@ -1,39 +1,43 @@
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import { serverurl } from '../App'
-import { useDispatch, useSelector } from 'react-redux'
-
-import { setCurrentShops } from '../pages/redux/UserSlice'
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { serverurl } from "../App";
+import { useDispatch, useSelector } from "react-redux";
+import { setCurrentShops } from "../pages/redux/UserSlice";
 
 const Usegetshopbycity = () => {
-  const dispatch = useDispatch()
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const {currentcity}=useSelector((state)=>state.user)
+  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { currentcity } = useSelector((state) => state.user);
 
   useEffect(() => {
-    const fetchShopbycity = async () => {
-      try {
-        setLoading(true)
-        const result = await axios.get(`${serverurl}/shop/getshopbycity/${currentcity}`, {
-          withCredentials: true,
-        })
-        if (result.data.success) {
-          dispatch(setCurrentShops(result.data.shops))
-          console.log(result.data)
-        }
-      } catch (err) {
-        console.log("❌ No shop found or error:", err?.response?.data || err.message ||err?.response?.status)
-        setError(err)
-      } finally {
-        setLoading(false)
-      }
+    if (!currentcity) {
+      dispatch(setCurrentShops([]));
+      setLoading(false);
+      return;
     }
 
-    fetchShopbycity()
-  }, [currentcity])
+    const fetchShopbycity = async () => {
+      try {
+        setLoading(true);
+        const result = await axios.get(`${serverurl}/shop/getshopbycity/${currentcity}`, {
+          withCredentials: true,
+        });
+        if (result.data.success) {
+          dispatch(setCurrentShops(result.data.shops));
+        }
+      } catch (err) {
+        console.log("No shop found or error:", err?.response?.data || err.message || err?.response?.status);
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  return { loading, error }  // optional: hook থেকে state return করা
-}
+    fetchShopbycity();
+  }, [currentcity, dispatch]);
 
-export default Usegetshopbycity
+  return { loading, error };
+};
+
+export default Usegetshopbycity;

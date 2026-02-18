@@ -12,7 +12,6 @@ const Deliveryboy = () => {
   const [data,setdata]=useState([])
   const [loading, setLoading] = useState(false)
   const [currentAssignment, setCurrentAssignment] = useState(null);
-  const[otp,setOtp]=useState('')
   const getassignment = async () => {
     try {
       setLoading(true)

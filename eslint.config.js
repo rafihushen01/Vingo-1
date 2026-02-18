@@ -23,7 +23,18 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      'no-unused-vars': [
+        'error',
+        {
+          varsIgnorePattern: '^(?:[A-Z_].*|motion|AnimatePresence|useAnimation)$',
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/pages/Firebase.jsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
     },
   },
 ])

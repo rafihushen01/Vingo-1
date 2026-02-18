@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import { IoMdCart } from "react-icons/io";
 import { FaSearch } from "react-icons/fa";
@@ -10,21 +10,21 @@ import { setSerachItems, setUserData } from "../pages/redux/UserSlice";
 import { useNavigate } from "react-router-dom";
 
 const Nav = () => {
-  const { userData, currentcity,cartitems } = useSelector((state) => state.user);
+  const { userData, currentcity, cartitems } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const [showInfo, setShowInfo] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [scrolling, setScrolling] = useState(false);
-  const [query,setquery]=useState(null)
-   const navigate=useNavigate()
-  // add elegant scroll animation
+  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+
   useEffect(() => {
     const handleScroll = () => setScrolling(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handlesignout = async () => {
+  const handleSignout = async () => {
     try {
       await axios.get(`${serverurl}/user/logout`, { withCredentials: true });
       dispatch(setUserData(null));
@@ -32,42 +32,41 @@ const Nav = () => {
       console.log(error.response?.data || error.message);
     }
   };
- const handlearchitems= async () => {
-  if (!query?.trim()) {
-    console.warn("Search query is empty ❌");
-    return;
-  }
 
-  try {
-    // Send request to backend
-    const res = await axios.get(`${serverurl}/item/searchitems`, {
-      params: { query: query.trim(), city: currentcity },
-      withCredentials: true,
-    });
-
-    if (res?.data?.success) {
-      // ✅ Search successful, handle data
-      console.log("Search results:", res.data.items);
-            dispatch(setSerachItems(res?.data?.items))     // assuming you want to update items state
-    } else {
-      // ⚠️ Backend returned no results or failed
-      console.warn("Search returned no results or failed:", res.data?.message || "Unknown error");
-      setItems([]);
+  const handleSearchItems = useCallback(async () => {
+    if (!query?.trim()) {
+      dispatch(setSerachItems(null));
+      return;
     }
-  } catch (err) {
-    console.error("Error fetching search results:", err?.response?.data?.message || err.message);
-    dispatch(setSerachItems(null));
-}
 
-};
- useEffect(() => {
+    try {
+      const res = await axios.get(`${serverurl}/item/searchitems`, {
+        params: { query: query.trim(), city: currentcity },
+        withCredentials: true,
+      });
+
+      if (res?.data?.success) {
+        dispatch(setSerachItems(res.data.items ?? []));
+      } else {
+        dispatch(setSerachItems([]));
+      }
+    } catch (err) {
+      console.error("Error fetching search results:", err?.response?.data?.message || err.message);
+      dispatch(setSerachItems(null));
+    }
+  }, [currentcity, dispatch, query]);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
-        if (query?.trim()) handlearchitems();
-        else dispatch(setSerachItems(null));
-    }, 300); // 300ms debounce
+      if (query?.trim()) {
+        handleSearchItems();
+      } else {
+        dispatch(setSerachItems(null));
+      }
+    }, 300);
 
     return () => clearTimeout(timer);
-}, [query]);
+  }, [dispatch, handleSearchItems, query]);
 
   return (
     <motion.nav
@@ -76,27 +75,23 @@ const Nav = () => {
           ? "bg-white/80 backdrop-blur-2xl shadow-[0_4px_30px_rgba(0,0,0,0.08)]"
           : "bg-gradient-to-r from-[#fff7f4] via-[#fff3ee] to-[#fff0eb]"
       }`}
-      style={{ height: "85px"}} // add more height
+      style={{ height: "85px" }}
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
     >
-      {/* logo */}
-  <motion.h1
+      <motion.h1
         className="text-3xl md:text-4xl font-extrabold tracking-tight text-[#ff4d2d] cursor-pointer select-none"
         whileHover={{ scale: 1.08 }}
         transition={{ type: "spring", stiffness: 250, damping: 12 }}
       >
         Vingo
       </motion.h1>
-    
 
-      {/* search + location (desktop) */}
       <motion.div
         className="hidden md:flex items-center bg-white rounded-full shadow-sm px-5 py-3 w-1/2 lg:w-1/3 focus-within:shadow-lg transition-all duration-300"
         whileHover={{ scale: 1.02 }}
       >
-        {/* location */}
         <div className="flex items-center gap-2 pr-3 border-r border-gray-200">
           <FaLocationDot size={20} className="text-[#ff4d2d]" />
           <span className="text-sm md:text-base font-semibold text-gray-700 hover:text-[#ff4d2d] cursor-pointer transition-colors">
@@ -104,48 +99,44 @@ const Nav = () => {
           </span>
         </div>
 
-        {/* search field */}
-      <div className="flex items-center flex-grow pl-3 gap-2">
-          <FaSearch size={18} className="text-gray-500" onClick={handlearchitems}/>
+        <div className="flex items-center flex-grow pl-3 gap-2">
+          <FaSearch size={18} className="text-gray-500" onClick={handleSearchItems} />
           <input
             type="text"
             placeholder="Search delicious food..."
-            className="w-full text-gray-700 placeholder-gray-400 focus:outline-none bg-transparent text-sm md:text-base" onChange={(e)=>setquery(e.target.value)} value={query}
+            className="w-full text-gray-700 placeholder-gray-400 focus:outline-none bg-transparent text-sm md:text-base"
+            onChange={(e) => setQuery(e.target.value)}
+            value={query}
           />
         </div>
       </motion.div>
 
-      {/* right section */}
       <div className="flex items-center gap-4 md:gap-6">
-        {/* cart */}
         <motion.button
           className="relative p-2.5 bg-[#ff4d2d] rounded-full text-white shadow-lg hover:shadow-xl hover:bg-[#ff684b] transition-all duration-300"
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.12 }}
         >
-          <IoMdCart size={23}  onClick={()=>navigate("/cartitem")}/>
+          <IoMdCart size={23} onClick={() => navigate("/cartitem")} />
           <span className="absolute -top-1 -right-1 bg-white text-[#ff4d2d] text-xs font-bold px-1.5 rounded-full shadow-md">
-            {cartitems.length}
+            {cartitems?.length ?? 0}
           </span>
         </motion.button>
 
-        {/* mobile search icon */}
-      <FaSearch
+        <FaSearch
           size={24}
           className="md:hidden text-[#ff4d2d] hover:text-[#ff684b] cursor-pointer transition-colors"
           onClick={() => setShowSearch((prev) => !prev)}
-        /> 
+        />
 
-        {/* my orders */}
         <motion.button
-        onClick={()=>navigate("/userorders")}
+          onClick={() => navigate("/userorders")}
           className="hidden md:block px-4 py-2 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-semibold hover:scale-110 hover:bg-[#ff4d2d]/20 transition-all duration-300"
           whileHover={{ y: -2 }}
         >
           My Orders
         </motion.button>
 
-        {/* profile */}
         {userData?.User?.fullname && (
           <motion.div
             onClick={() => setShowInfo((prev) => !prev)}
@@ -158,7 +149,6 @@ const Nav = () => {
         )}
       </div>
 
-      {/* mobile search */}
       <AnimatePresence>
         {showSearch && (
           <motion.div
@@ -168,17 +158,18 @@ const Nav = () => {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="absolute top-full left-0 w-full bg-white shadow-md py-3 px-5 flex items-center gap-3 md:hidden backdrop-blur-2xl"
           >
-            <FaSearch size={20} className="text-gray-500" onClick={handlearchitems} />
+            <FaSearch size={20} className="text-gray-500" onClick={handleSearchItems} />
             <input
               type="text"
               placeholder="Search something tasty..."
-              className="w-full text-gray-700 placeholder-gray-400 focus:outline-none bg-transparent"  onChange={(e)=>setquery(e.target.value)} value={query}
+              className="w-full text-gray-700 placeholder-gray-400 focus:outline-none bg-transparent"
+              onChange={(e) => setQuery(e.target.value)}
+              value={query}
             />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* profile dropdown */}
       <AnimatePresence>
         {showInfo && (
           <motion.div
@@ -192,13 +183,16 @@ const Nav = () => {
               {userData.User.fullname.toUpperCase()}
             </div>
 
-            <button className="md:hidden px-3 py-2 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-semibold hover:scale-105 transition-all duration-300"      onClick={()=>navigate("/userorders")}>
+            <button
+              className="md:hidden px-3 py-2 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-semibold hover:scale-105 transition-all duration-300"
+              onClick={() => navigate("/userorders")}
+            >
               My Orders
             </button>
 
             <button
               className="text-[#ff4d2d] font-bold hover:text-gray-800 transition-all duration-300"
-              onClick={handlesignout}
+              onClick={handleSignout}
             >
               Log Out
             </button>

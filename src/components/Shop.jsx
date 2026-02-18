@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { serverurl } from "../App";
 import Itemcard from "../pages/ItemCard";
-import {FaUtensils} from "react-icons/fa"
+
 export default function Shop() {
   const { shopId } = useParams();
   const [shop, setShop] = useState(null);
@@ -12,12 +12,8 @@ export default function Shop() {
   const [owner, setOwner] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
+  const fetchShop = useCallback(async () => {
     if (!shopId) return;
-    fetchShop();
-  }, [shopId]);
-
-  async function fetchShop() {
     try {
       setLoading(true);
       const res = await axios.get(`${serverurl}/item/getitembyshop/${shopId}`, { withCredentials: true });
@@ -32,17 +28,20 @@ export default function Shop() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [shopId]);
+
+  useEffect(() => {
+    fetchShop();
+  }, [fetchShop]);
 
   const fadeInUp = { initial: { opacity: 0, y: 20 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6 } };
   const fadeInLeft = { initial: { opacity: 0, x: -50 }, animate: { opacity: 1, x: 0 }, transition: { duration: 0.7 } };
   const fadeInRight = { initial: { opacity: 0, x: 50 }, animate: { opacity: 1, x: 0 }, transition: { duration: 0.7 } };
 
-  const formatDate = (date) => (date ? new Date(date).toLocaleString() : "—");
+  const formatDate = (date) => (date ? new Date(date).toLocaleString() : "-");
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-12">
-      {/* Header */}
       <motion.div {...fadeInUp} className="text-center mb-12">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-3 bg-gradient-to-r from-orange-400 via-pink-500 to-purple-500 text-transparent bg-clip-text animate-gradient-x">
           {shop?.name || "Loading..."}
@@ -51,7 +50,6 @@ export default function Shop() {
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Shop Info */}
         <motion.div
           {...fadeInLeft}
           className="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-5 hover:scale-105 hover:shadow-pink-500/50 transition-transform duration-500"
@@ -64,12 +62,14 @@ export default function Shop() {
                   alt={shop.name}
                   className="w-full h-64 sm:h-72 md:h-80 object-cover transition-transform duration-500 group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-70"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-70" />
               </div>
               <div className="mt-4 space-y-2">
                 <p className="text-2xl sm:text-3xl font-bold">{shop.name}</p>
                 <p className="text-gray-900">{shop.address}</p>
-                <p className="text-gray-900">{shop.city}, {shop.state}</p>
+                <p className="text-gray-900">
+                  {shop.city}, {shop.state}
+                </p>
                 <p className="text-sm text-gray-500">Created: {formatDate(shop.createdAt)}</p>
               </div>
             </>
@@ -77,16 +77,12 @@ export default function Shop() {
             <div className="h-64 sm:h-72 md:h-80 bg-gray-200 animate-pulse rounded-2xl" />
           )}
         </motion.div>
-       
-        {/* Items Grid */}
+
         <motion.div {...fadeInUp} className="col-span-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            
-
-          {items.length > 0 ? (
+          {loading ? (
+            <p className="text-gray-500 text-center col-span-full py-12">Loading items...</p>
+          ) : items.length > 0 ? (
             <AnimatePresence>
-
-
-              
               {items.map((item) => (
                 <motion.div
                   key={item._id}
@@ -106,7 +102,6 @@ export default function Shop() {
           )}
         </motion.div>
 
-        {/* Owner Info */}
         <motion.div
           {...fadeInRight}
           className="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-5 hover:scale-105 hover:shadow-orange-400/50 transition-transform duration-500"

@@ -2,11 +2,9 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { MdCheckCircle, MdDeliveryDining } from "react-icons/md";
 import { FaArrowRight } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 
 const PlaceOrder = () => {
   const [countdown, setCountdown] = useState(10);
-   const navigate=useNavigate()
   useEffect(() => {
     const timer = setInterval(() => {
       setCountdown((prev) => (prev > 0 ? prev - 1 : 0));

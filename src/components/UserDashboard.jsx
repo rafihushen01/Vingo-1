@@ -7,9 +7,7 @@ import CategoryCard from "../pages/CategoryCard";
 import Shopcard from "../pages/ShopCard";
 import { motion } from "framer-motion";
 import Itemcard from "../pages/ItemCard";
-import { Navigate, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { serverurl } from "../App";
+import { useNavigate } from "react-router-dom";
 import Footer from "./Footer";
 
 const UserDashboard = () => {
