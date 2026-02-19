@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import{getAuth} from "firebase/auth"
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_API_KEY,
-  authDomain: "vingo-81cb8.firebaseapp.com",
+  authDomain: import.meta.env.VITE_AUTH_DOMAIN || "vingo-81cb8.firebaseapp.com",
   projectId: "vingo-81cb8",
   storageBucket: "vingo-81cb8.firebasestorage.app",
   messagingSenderId: "877312964639",

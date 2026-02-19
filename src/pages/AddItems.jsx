@@ -4,6 +4,7 @@ import { FaCloudUploadAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { serverurl } from "../App";
 import { motion } from "framer-motion";
+import { useSelector } from "react-redux";
 
 const AddItems = () => {
   const [formData, setFormData] = useState({
@@ -16,7 +17,9 @@ const AddItems = () => {
   const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const fileInputRef = useRef(null); 
+  const fileInputRef = useRef(null);
+  const { shopData } = useSelector((state) => state.owner);
+  const { userData } = useSelector((state) => state.user);
 
   const categories = [
     "Starter", "Main-Course", "Desserts", "Beverage", "Snacks", "Salads",
@@ -43,6 +46,19 @@ const AddItems = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (userData?.User?.role !== "owner") {
+      alert("Only owners can add items.");
+      navigate("/");
+      return;
+    }
+
+    if (!shopData?._id) {
+      alert("Create your shop first before adding items.");
+      navigate("/createeditshop");
+      return;
+    }
+
     try {
       setLoading(true);
       const form = new FormData();
@@ -57,11 +73,11 @@ const AddItems = () => {
       });
 
       if (res.data.success) {
-        alert("✅ Item added successfully!");
+        alert("Item added successfully");
         navigate("/");
       }
     } catch (error) {
-      alert("❌ Error adding item");
+      alert(error?.response?.data?.message || "Error adding item");
       console.log(error.response?.data, error.response?.message, error.response?.status);
     } finally {
       setLoading(false);
@@ -196,3 +212,4 @@ const AddItems = () => {
 };
 
 export default AddItems;
+

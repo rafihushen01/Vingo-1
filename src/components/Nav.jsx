@@ -40,6 +40,11 @@ const Nav = () => {
       return;
     }
 
+    if (!currentcity?.trim()) {
+      dispatch(setSerachItems([]));
+      return;
+    }
+
     try {
       const res = await axios.get(`${serverurl}/item/searchitems`, {
         params: { query: query.trim(), city: currentcity },
@@ -59,7 +64,7 @@ const Nav = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (query?.trim()) {
+      if (query?.trim() && currentcity?.trim()) {
         handleSearchItems();
       } else {
         dispatch(setSerachItems(null));
@@ -67,7 +72,7 @@ const Nav = () => {
     }, 300);
 
     return () => clearTimeout(timer);
-  }, [dispatch, handleSearchItems, query]);
+  }, [currentcity, dispatch, handleSearchItems, query]);
 
   return (
     <motion.nav

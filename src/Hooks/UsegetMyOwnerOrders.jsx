@@ -24,9 +24,8 @@ const UseGetownerOrders = () => {
           withCredentials: true,
         });
 
-        if (result.data.success) {
-          dispatch(setownerorders(result.data.orders));
-        }
+        dispatch(setownerorders(result?.data?.orders || []));
+        setError(null);
       } catch (err) {
         if (err?.response?.status === 401) {
           dispatch(setownerorders(null));

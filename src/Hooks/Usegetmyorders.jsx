@@ -11,9 +11,10 @@ const UseGetOrders = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!userData?.User?.id) {
+    if (!userData?.User?.id || userData?.User?.role !== "user") {
       dispatch(setMyorders(null));
       setLoading(false);
+      setError(null);
       return;
     }
 
@@ -23,9 +24,8 @@ const UseGetOrders = () => {
         const result = await axios.get(`${serverurl}/order/userorders`, {
           withCredentials: true,
         });
-        if (result.data.success) {
-          dispatch(setMyorders(result.data.orders));
-        }
+        dispatch(setMyorders(result?.data?.orders || []));
+        setError(null);
       } catch (err) {
         if (err?.response?.status === 401) {
           dispatch(setMyorders(null));
@@ -40,7 +40,7 @@ const UseGetOrders = () => {
     };
 
     fetchOrders();
-  }, [dispatch, userData?.User?.id]);
+  }, [dispatch, userData?.User?.id, userData?.User?.role]);
 
   return { loading, error };
 };

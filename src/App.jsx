@@ -27,6 +27,7 @@ import Shop from './components/Shop.jsx'
 export const serverurl="https://vingobackend-production.up.railway.app"
 const APP = () => {
    const{userData}=useSelector(state=>state.user)
+  const role = userData?.User?.role
   UseGetCurrentUser();
   UseGetCurrentCity()
   UseGetCurrentShop()
@@ -46,14 +47,14 @@ const APP = () => {
         <Route path='/forgetpass' element={userData ?<ForgetPassword/> :<Navigate to={"/signup"}/>}/>
              <Route path='/' element={userData ?<Home/>:<Navigate to={"/signup"}/>}/> 
 
-                             <Route path='/createeditshop' element={userData ?<Createeditshop/>:<Navigate to={"/signup"}/>}/> 
-                                            <Route path='/additems' element={userData ?<AddItems/>:<Navigate to={"/signup"}/>}/> 
-<Route path="/edititem/:itemId" element={userData ? <EditItems/> : <Navigate to={"/signup"}/>}/>
+                             <Route path='/createeditshop' element={!userData ? <Navigate to={"/signup"}/> : role === "owner" ? <Createeditshop/> : <Navigate to={"/"}/>}/> 
+                                            <Route path='/additems' element={!userData ? <Navigate to={"/signup"}/> : role === "owner" ? <AddItems/> : <Navigate to={"/"}/>}/> 
+<Route path="/edititem/:itemId" element={!userData ? <Navigate to={"/signup"}/> : role === "owner" ? <EditItems/> : <Navigate to={"/"}/>}/>
   <Route path='/cartitem' element={userData ?<CartItem/>:<Navigate to={"/signup"}/>}/> 
    <Route path='/checkout' element={userData ?<Checkout/>:<Navigate to={"/signup"}/>}/> 
   <Route path='/placeorder' element={userData ?<PlaceOrder/>:<Navigate to={"/signup"}/>}/> 
-   <Route path='/ownerorders' element={userData ?<OwnerOrders/>:<Navigate to={"/signup"}/>}/>
-      <Route path='/userorders' element={userData ?<UserMyorders/>:<Navigate to={"/signup"}/>}/>
+   <Route path='/ownerorders' element={!userData ? <Navigate to={"/signup"}/> : role === "owner" ? <OwnerOrders/> : <Navigate to={"/"}/>}/>
+      <Route path='/userorders' element={!userData ? <Navigate to={"/signup"}/> : role === "user" ? <UserMyorders/> : <Navigate to={"/"}/>}/>
      <Route path='/trackorder/:orderId' element={userData ?<TrackorderPage/>:<Navigate to={"/signup"}/>}/>
         <Route path='/shop/:shopId' element={userData ?<Shop/>:<Navigate to={"/signup"}/>}/>
 

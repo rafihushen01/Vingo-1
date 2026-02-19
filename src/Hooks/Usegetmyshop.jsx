@@ -11,9 +11,10 @@ const UseGetCurrentShop = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!userData?.User?.id) {
+    if (!userData?.User?.id || userData?.User?.role !== "owner") {
       dispatch(setShopData(null));
       setLoading(false);
+      setError(null);
       return;
     }
 
@@ -23,9 +24,8 @@ const UseGetCurrentShop = () => {
         const result = await axios.get(`${serverurl}/shop/getmyshop`, {
           withCredentials: true,
         });
-        if (result.data.success) {
-          dispatch(setShopData(result.data.shop));
-        }
+        dispatch(setShopData(result?.data?.shop || null));
+        setError(null);
       } catch (err) {
         if (err?.response?.status === 401) {
           dispatch(setShopData(null));
@@ -40,7 +40,7 @@ const UseGetCurrentShop = () => {
     };
 
     fetchShop();
-  }, [dispatch, userData?.User?.id]);
+  }, [dispatch, userData?.User?.id, userData?.User?.role]);
 
   return { loading, error };
 };
