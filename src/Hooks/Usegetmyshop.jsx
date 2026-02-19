@@ -1,36 +1,48 @@
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import { serverurl } from '../App'
-import { useDispatch } from 'react-redux'
-import { setShopData } from '../pages/redux/OwnerSlice'
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { serverurl } from "../App";
+import { setShopData } from "../pages/redux/OwnerSlice";
 
 const UseGetCurrentShop = () => {
-  const dispatch = useDispatch()
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const dispatch = useDispatch();
+  const { userData } = useSelector((state) => state.user);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchShop = async () => {
-      try {
-        setLoading(true)
-        const result = await axios.get(`${serverurl}/shop/getmyshop`, {
-          withCredentials: true,
-        })
-        if (result.data.success) {
-          dispatch(setShopData(result.data.shop))
-        }
-      } catch (err) {
-        console.log("❌ No shop found or error:", err?.response?.data || err.message)
-        setError(err)
-      } finally {
-        setLoading(false)
-      }
+    if (!userData?.User?.id) {
+      dispatch(setShopData(null));
+      setLoading(false);
+      return;
     }
 
-    fetchShop()
-  }, [dispatch])
+    const fetchShop = async () => {
+      try {
+        setLoading(true);
+        const result = await axios.get(`${serverurl}/shop/getmyshop`, {
+          withCredentials: true,
+        });
+        if (result.data.success) {
+          dispatch(setShopData(result.data.shop));
+        }
+      } catch (err) {
+        if (err?.response?.status === 401) {
+          dispatch(setShopData(null));
+          setError(null);
+          return;
+        }
+        console.log("No shop found or error:", err?.response?.data || err.message);
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  return { loading, error }  // optional: hook থেকে state return করা
-}
+    fetchShop();
+  }, [dispatch, userData?.User?.id]);
 
-export default UseGetCurrentShop
+  return { loading, error };
+};
+
+export default UseGetCurrentShop;

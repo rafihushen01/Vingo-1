@@ -28,6 +28,7 @@ const Delnav = () => {
  const handlesignout = async () => {
     try {
       await axios.get(`${serverurl}/user/logout`, { withCredentials: true });
+      localStorage.removeItem("vingo_auth_token");
       dispatch(setUserData(null));
     } catch (error) {
       console.log(error.response?.data || error.message);

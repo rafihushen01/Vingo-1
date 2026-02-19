@@ -1,40 +1,49 @@
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import { serverurl } from '../App'
-import { useDispatch } from 'react-redux'
-import { setownerorders } from '../pages/redux/OwnerSlice'
-
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { serverurl } from "../App";
+import { setownerorders } from "../pages/redux/OwnerSlice";
 
 const UseGetownerOrders = () => {
-  const dispatch = useDispatch()
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const dispatch = useDispatch();
+  const { userData } = useSelector((state) => state.user);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchownerorders = async () => {
-      try {
-        setLoading(true)
-        const result = await axios.get(`${serverurl}/order/ownerorders`, {
-          withCredentials: true,
-        })
-        if (result.data.success) {
-          const dispatchdata=   dispatch(setownerorders(result.data.orders))
-          
-           console.log(result.data)
-           console.log(dispatchdata)
-        }
-      } catch (err) {
-        console.log("❌ No Order found error:", err?.response?.data || err.message)
-        setError(err)
-      } finally {
-        setLoading(false)
-      }
+    if (!userData?.User?.id || userData?.User?.role !== "owner") {
+      dispatch(setownerorders(null));
+      setLoading(false);
+      return;
     }
 
-    fetchownerorders()
-  }, [dispatch])
+    const fetchownerorders = async () => {
+      try {
+        setLoading(true);
+        const result = await axios.get(`${serverurl}/order/ownerorders`, {
+          withCredentials: true,
+        });
 
-  return { loading, error }  // optional: hook থেকে state return করা
-}
+        if (result.data.success) {
+          dispatch(setownerorders(result.data.orders));
+        }
+      } catch (err) {
+        if (err?.response?.status === 401) {
+          dispatch(setownerorders(null));
+          setError(null);
+          return;
+        }
+        console.log("No owner order found error:", err?.response?.data || err.message);
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-export default UseGetownerOrders
+    fetchownerorders();
+  }, [dispatch, userData?.User?.id, userData?.User?.role]);
+
+  return { loading, error };
+};
+
+export default UseGetownerOrders;
