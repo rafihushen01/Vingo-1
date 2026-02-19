@@ -1,8 +1,10 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FaFacebook, FaInstagram, FaYoutube, FaLinkedin } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const Footer = () => {
+  const navigate=useNavigate()
   return (
     <footer className="w-full bg-black text-gray-300 pt-14 pb-10 px-6 md:px-16 lg:px-24 border-t border-gray-800">
       
@@ -119,7 +121,16 @@ const Footer = () => {
           © {new Date().getFullYear()} <span className="text-white font-semibold">Vingo</span>. All Rights Reserved.
         </p>
         <p className="tracking-wide">
-          <span className="text-[#ff4d2d] font-bold">Made & Developed by Rafi Khan Team</span>
+         
+            <motion.a
+    href="https://mdrafikhan.vercel.app"
+
+    whileHover={{ scale: 1.2 }}
+    className="text-[#ff4d2d] font-bold hover:text-[#ff4d2d] transition-colors cursor-pointer"
+  >
+    Developer By Md Rafi Khan
+    
+  </motion.a>
         </p>
       </div>
     </footer>
