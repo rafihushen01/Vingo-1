@@ -101,7 +101,7 @@ const Nav = () => {
         <div className="flex items-center gap-2 pr-3 border-r border-gray-200">
           <FaLocationDot size={20} className="text-[#ff4d2d]" />
           <span className="text-sm md:text-base font-semibold text-gray-700 hover:text-[#ff4d2d] cursor-pointer transition-colors">
-            {currentcity || "Select City"}
+            {currentcity || "Your City .."}
           </span>
         </div>
 
