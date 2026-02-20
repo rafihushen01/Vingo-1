@@ -27,8 +27,8 @@ import Shop from './components/Shop.jsx'
 export const serverurl="https://vingobackend-production.up.railway.app"
 const APP = () => {
    const{userData}=useSelector(state=>state.user)
+  const authChecked = UseGetCurrentUser();
   const role = userData?.User?.role
-  UseGetCurrentUser();
   UseGetCurrentCity()
   UseGetCurrentShop()
   Usegetshopbycity()
@@ -37,6 +37,14 @@ const APP = () => {
   UseGetOrders()
   UseGetownerOrders()
   useUpdateLocation()
+
+  if (!authChecked) {
+    return (
+      <div className="w-full min-h-screen flex items-center justify-center bg-[#fff9f6]">
+        <h1 className="text-2xl font-semibold text-gray-700">Checking session...</h1>
+      </div>
+    );
+  }
  
 
   return (
