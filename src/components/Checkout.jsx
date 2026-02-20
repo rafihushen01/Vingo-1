@@ -11,6 +11,16 @@ import { setAddress, setLocation } from "../pages/redux/MapSlice";
 import { MdDeliveryDining } from "react-icons/md";
  import {serverurl} from "../App.jsx"
 import { useNavigate } from "react-router-dom";
+import vingologo from "../../public/Vingo.png"
+const EXTERNAL_REQUEST_CONFIG = {
+  withCredentials: false,
+  timeout: 12000,
+};
+
+const publicHttp = axios.create({
+  withCredentials: false,
+  timeout: 12000,
+});
 // 🧭 Custom glossy map marker
 const customIcon = new L.Icon({
   iconUrl: "https://cdn-icons-png.flaticon.com/512/149/149060.png",
@@ -37,10 +47,11 @@ const Recentermap = ({ location }) => {
 // 🧩 Helper: get current address by lat/lng
 const getcurrentaddress = async (lat, lng, dispatch) => {
   try {
-    const result = await axios.get(
+    const result = await publicHttp.get(
       `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lng}&format=json&apiKey=${
         import.meta.env.VITE_GEO_API
-      }`
+      }`,
+      EXTERNAL_REQUEST_CONFIG
     );
     const formatted =
       result?.data?.results?.[0]?.formatted || "Unknown location";
@@ -80,10 +91,11 @@ const Checkout = () => {
     try {
       setLoading(true);
 
-      const result = await axios.get(
+      const result = await publicHttp.get(
         `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(
           addressinput
-        )}&format=json&apiKey=${import.meta.env.VITE_GEO_API}`
+        )}&format=json&apiKey=${import.meta.env.VITE_GEO_API}`,
+        EXTERNAL_REQUEST_CONFIG
       );
 
       const loc = result?.data?.results?.[0];
@@ -191,9 +203,35 @@ const Checkout = () => {
         transition={{ duration: 0.8 }}
         className="w-full max-w-[950px] backdrop-blur-3xl bg-white/30 rounded-[2rem] shadow-[0_0_60px_rgba(255,77,45,0.4)] border border-white/40 p-8 space-y-8 z-10"
       >
-        <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#ff4d2d] to-[#ff7f50] text-center drop-shadow-lg">
-          🍔 Vingo Checkout
-        </h1>
+        <motion.div
+  initial={{ opacity: 0, y: -40 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.6 }}
+  className="flex flex-col items-center justify-center mb-12"
+>
+
+  {/* Floating Logo */}
+  <motion.img
+    src={vingologo}
+    alt="vingologo"
+    animate={{ y: [0, -8, 0] }}
+    transition={{
+      duration: 3,
+      repeat: Infinity,
+      ease: "easeInOut",
+    }}
+    className="h-34 w-34 object-contain drop-shadow-[0_0_25px_rgba(255,77,45,0.6)]"
+  />
+
+  {/* Main Heading */}
+  <h1 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#ff4d2d] via-[#ff6a3d] to-[#ff7f50] text-center drop-shadow-2xl mt-4 tracking-wide">
+    Vingo Checkout
+  </h1>
+
+  {/* Glow Line */}
+ 
+
+</motion.div>
        
 
         {/* 📍 Address Input */}
