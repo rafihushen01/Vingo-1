@@ -13,8 +13,10 @@ const UseGetCurrentUser = () => {
 
     const fetchuser = async () => {
       try {
+        const token = localStorage.getItem("vingo_auth_token");
         const result = await axios.get(`${serverurl}/user/getcurrent`, {
           withCredentials: true,
+          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
 
         if (result?.data?.success && result?.data?.User?.id) {

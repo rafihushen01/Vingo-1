@@ -101,8 +101,36 @@ const useGetCurrentCity = () => {
       }
     };
 
+    const fallbackByPublicIp = async () => {
+      try {
+        const { data } = await axios.get("https://ipapi.co/json/");
+
+        const city = data?.city || data?.region || null;
+        const state = data?.region || null;
+        const lat = Number(data?.latitude);
+        const lon = Number(data?.longitude);
+        const addressParts = [data?.city, data?.region, data?.country_name].filter(Boolean);
+        const address = addressParts.length ? addressParts.join(", ") : null;
+
+        applyResolvedLocation({
+          city,
+          state,
+          address,
+          lat: Number.isFinite(lat) ? lat : undefined,
+          lon: Number.isFinite(lon) ? lon : undefined,
+        });
+
+        return Boolean(city || state || address);
+      } catch (error) {
+        console.error("Public IP fallback failed:", error?.message || error);
+        return false;
+      }
+    };
+
     const fallbackByIp = async () => {
-      if (!apiKey) return false;
+      if (!apiKey) {
+        return fallbackByPublicIp();
+      }
 
       try {
         const { data } = await axios.get(
@@ -129,7 +157,7 @@ const useGetCurrentCity = () => {
         return Boolean(city || state || address);
       } catch (error) {
         console.error("IP location fallback failed:", error?.message || error);
-        return false;
+        return fallbackByPublicIp();
       }
     };
 
@@ -146,7 +174,10 @@ const useGetCurrentCity = () => {
           const { latitude, longitude } = pos.coords;
           const resolved = await reverseLookupByLatLon(latitude, longitude);
           if (!resolved) {
-            await fallbackByIp();
+            const ipResolved = await fallbackByIp();
+            if (!ipResolved) {
+              await fallbackByPublicIp();
+            }
           }
         },
         async () => {
