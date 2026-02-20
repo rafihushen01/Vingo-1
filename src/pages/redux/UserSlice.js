@@ -55,6 +55,9 @@ const userslice = createSlice({
 
       if (existingItem) {
         existingItem.quantity += newItem.quantity;
+        if (!existingItem.shop && newItem.shop) {
+          existingItem.shop = newItem.shop;
+        }
       } else {
         // push করার আগে shallow copy নিই যাতে Immer proxy revoke না হয়
         state.cartitems.push({ ...newItem });

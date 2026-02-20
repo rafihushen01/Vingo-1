@@ -23,6 +23,7 @@ import UserMyorders from './components/UserMyorders.jsx'
 import useUpdateLocation from './Hooks/Useupdateuserlocation.jsx'
 import TrackorderPage from './components/TrackorderPage.jsx'
 import Shop from './components/Shop.jsx'
+import RouteMetadata from './components/RouteMetadata.jsx'
 
 export const serverurl="https://vingobackend-production.up.railway.app"
 const APP = () => {
@@ -49,6 +50,7 @@ const APP = () => {
 
   return (
     <div>
+      <RouteMetadata />
       <Routes>
           <Route path='/signup' element={!userData ?<Signup/> :<Navigate to={"/"}/>}/>
       <Route path='/signin' element={!userData ?<Signin/>:<Navigate to={"/"}/>}/>

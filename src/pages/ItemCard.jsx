@@ -64,6 +64,8 @@ const ItemCard = () => {
   // ADD TO CART (ONLY HERE REDUX WILL UPDATE)
   const handleaddtocart = (item) => {
     const quantity = quantities[item._id] || 1
+    const shopId =
+      typeof item.shop === "object" ? item.shop?._id || item.shop?.id : item.shop
 
     dispatch(
       Addtocart({
@@ -72,6 +74,7 @@ const ItemCard = () => {
         image: item.image,
         price: item.price,
         quantity,
+        shop: shopId ? String(shopId) : null,
       })
     )
   }

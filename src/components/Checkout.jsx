@@ -137,11 +137,40 @@ const Checkout = () => {
     }
   };
 
+  const getShopId = (item) => {
+    const rawShop = item?.shop ?? item?.shopId ?? null;
+    if (!rawShop) return null;
+    if (typeof rawShop === "object") {
+      return rawShop?._id || rawShop?.id || null;
+    }
+    return rawShop;
+  };
+
+  const normalizeCartItems = (items = []) => {
+    return items.map((item) => ({
+      ...item,
+      id: item?.id || item?._id || null,
+      shop: getShopId(item),
+      quantity: Number(item?.quantity) > 0 ? Number(item.quantity) : 1,
+      price: Number(item?.price) || 0,
+    }));
+  };
+
 
   const handleplaceorder = async () => {
     try {
+      const normalizedCartItems = normalizeCartItems(cartitems);
+      const invalidCartItem = normalizedCartItems.find((item) => !item.id);
+
+      if (invalidCartItem) {
+        alert(
+          "Some cart items are invalid. Please remove and re-add the item, then place the order again."
+        );
+        return;
+      }
+
       const payload = {
-        cartitems,
+        cartitems: normalizedCartItems,
         paymentmethod,
         deliveryaddress: {
           text: addressinput,
