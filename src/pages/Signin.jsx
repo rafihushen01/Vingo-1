@@ -18,64 +18,76 @@ const Signin = () => {
   const [showpass, setShowpass] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
   const navigate = useNavigate();
-  const[loading,setloading]=useState(false)
-const dispatch=useDispatch()
+  const [loading, setloading] = useState(false);
+  const dispatch = useDispatch();
   const handlechange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     
   };
 
   const handlesubmit = async (e) => {
-  e.preventDefault(); // prevent form refresh
-  setloading(true)
-  try {
-    const result = await axios.post(`${serverurl}/user/signin`, {
-      email: form.email,
-      password: form.password,
-    }, { withCredentials: true });
-    dispatch(setUserData(result.data))
+    e.preventDefault(); // prevent form refresh
+    if (loading) return;
 
-    if (result.data.success) {
-      alert("Signin successful!");
-      setloading(false)
-      navigate("/");
-    } else {
-      alert(result.data.message || "Signin failed");
+    setloading(true);
+    try {
+      const result = await axios.post(
+        `${serverurl}/user/signin`,
+        {
+          email: form.email,
+          password: form.password,
+        },
+        { withCredentials: true }
+      );
+
+      if (result.data.success) {
+        dispatch(setUserData(result.data));
+        alert("Signin successful!");
+        navigate("/");
+      } else {
+        alert(result.data.message || "Signin failed");
+      }
+    } catch (error) {
+      console.error("Signin Error:", error.response?.data || error.message);
+      alert(`Signin failed: ${error.response?.data?.message || error.message}`);
+    } finally {
+      setloading(false);
     }
-  } catch (error) {
-    console.error("Signin Error:", error.response?.data || error.message);
-    alert(`Signin failed: ${error.response?.data?.message || error.message}`);
-  }
-};
-const googlesignin= async () => {
-    setloading(true)
+  };
 
-  try {
-    const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(Auth, provider);
+  const googlesignin = async () => {
+    if (loading) return;
+    setloading(true);
 
-    const { data } = await axios.post(
-      `${serverurl}/user/googlelogin`,
-      {
-        fullname: result.user.displayName,
-        email: result.user.email,
-        
-      },
-      { withCredentials: true }
-    );
-    dispatch(setUserData(data))
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(Auth, provider);
 
-    if (data.success) {
-      alert("Google Signin Successful");
-      setloading(false)
-      navigate("/");
+      const { data } = await axios.post(
+        `${serverurl}/user/googlelogin`,
+        {
+          fullname: result.user.displayName,
+          email: result.user.email,
+          
+        },
+        { withCredentials: true }
+      );
+
+      if (data.success) {
+        dispatch(setUserData(data));
+        alert("Google Signin Successful");
+        navigate("/");
+      } else {
+        alert(data.message || "Google Signin failed");
+      }
+    } catch (error) {
+      console.log("google signup error:", error);
+      console.log("response:", error.response?.data);
+      alert(`Google Signin failed: ${error.response?.data?.message || error.message}`);
+    } finally {
+      setloading(false);
     }
-
-  } catch (error) {
-    console.log("google signup error:", error);
-    console.log("response:", error.response?.data);
-  }
-};
+  };
 
 
   return (
@@ -95,7 +107,9 @@ const googlesignin= async () => {
 
         {/* Google Signin (UI only) */}
         <button
-        onClick={googlesignin}
+          type="button"
+          onClick={googlesignin}
+          disabled={loading}
           className="w-full flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-lg hover:bg-gray-50 transition mb-4"
         >
           <FcGoogle className="text-2xl" />
@@ -153,6 +167,7 @@ const googlesignin= async () => {
          
             whileTap={{ scale: 0.97 }}
             type="submit"
+            disabled={loading}
             className="w-full py-2 rounded-lg text-white font-semibold shadow-md"
             style={{ backgroundColor: primarycolor }}
             onMouseEnter={(e) => (e.target.style.backgroundColor = hovercolor)}

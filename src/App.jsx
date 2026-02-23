@@ -42,7 +42,7 @@ const APP = () => {
   if (!authChecked) {
     return (
       <div className="w-full min-h-screen flex items-center justify-center bg-[#fff9f6]">
-        <h1 className="text-2xl font-semibold text-gray-700">Checking session...</h1>
+        <h1 className="text-2xl font-semibold text-gray-700">Checking Credintials...</h1>
       </div>
     );
   }
@@ -54,7 +54,7 @@ const APP = () => {
       <Routes>
           <Route path='/signup' element={!userData ?<Signup/> :<Navigate to={"/"}/>}/>
       <Route path='/signin' element={!userData ?<Signin/>:<Navigate to={"/"}/>}/>
-        <Route path='/forgetpass' element={userData ?<ForgetPassword/> :<Navigate to={"/signup"}/>}/>
+        <Route path='/forgetpass' element={<ForgetPassword/> }/>
              <Route path='/' element={userData ?<Home/>:<Navigate to={"/signup"}/>}/> 
 
                              <Route path='/createeditshop' element={!userData ? <Navigate to={"/signup"}/> : role === "owner" ? <Createeditshop/> : <Navigate to={"/"}/>}/> 

@@ -130,7 +130,7 @@ const navigate=useNavigate()
             transition={{ duration: 0.3 }}
             className="absolute top-full left-0 w-full bg-white shadow-lg md:hidden flex flex-col items-start gap-4 px-6 py-5 border-t border-gray-100 backdrop-blur-xl"
           >
-     { shopData &&     <button className="flex items-center gap-3 text-gray-700 hover:text-[#ff4d2d] font-semibold text-base">
+     { shopData &&     <button className="flex items-center gap-3 text-gray-700 hover:text-[#ff4d2d] font-semibold text-base"  onClick={()=>navigate("/additems")}>
               <FaPlus className="text-[#ff4d2d] cursor-pointer" /> Add Food Item
             </button> }
        { shopData &&      <button className="px-4 py-2 rounded-lg bg-[#ff4d2d]/10 text-[#ff4d2d] font-semibold hover:scale-110 hover:bg-[#ff4d2d]/20 transition-all duration-300" onClick={()=>navigate("/ownerorders")}>
