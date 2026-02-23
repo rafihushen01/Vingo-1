@@ -59,7 +59,7 @@ const navigate=useNavigate()
         <div className="hidden md:flex items-center gap-8" onClick={()=>navigate("/additems")}>
           <motion.button
             whileHover={{ y: -2 }}
-            className="flex items-center gap-2 text-gray-800 hover:text-[#ff4d2d] text-base font-semibold transition-all cursor-pointer "
+            className="flex items-center gap-2 text-gray-800 hover:text-[#ff4d2d] text-base font-semibold transition-all cursor-pointer " onClick={()=>navigate("/additems")}
           >
             <FaPlus className="text-[#ff4d2d]" /> Add Food Item
           </motion.button>
