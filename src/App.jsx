@@ -25,7 +25,7 @@ import TrackorderPage from './components/TrackorderPage.jsx'
 import Shop from './components/Shop.jsx'
 import RouteMetadata from './components/RouteMetadata.jsx'
 
-export const serverurl="https://vingobackend-production.up.railway.app"
+export const serverurl="https://vingobackend-1.onrender.com"
 const APP = () => {
    const{userData}=useSelector(state=>state.user)
   const authChecked = UseGetCurrentUser();
